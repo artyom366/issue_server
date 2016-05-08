@@ -6,6 +6,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import sample.components.CenterComponent;
 import sample.components.TopComponent;
+import sample.service.SimModel;
 import sample.system.Reference;
 
 public class Main extends Application {
@@ -40,5 +41,7 @@ public class Main extends Application {
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
+
+        SimModel.run();
     }
 }

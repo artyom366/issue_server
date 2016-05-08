@@ -6,12 +6,13 @@ import sample.domain.Issue;
 
 public class ErlangIssueFactory {
 
-    public static Issue getInstance() {
+    public static Issue getInstance(double currentTime) {
         Issue issue = new Issue();
         issue.setType(Issue.type.ERLANG);
 
-        double time = ErlangFlowGenerator.generate();
-        issue.setGenerationTime(time);
+        double generationTime = ErlangFlowGenerator.generate();
+        issue.setRandomGenerationValue(generationTime);
+        issue.setGenerationTime(currentTime + generationTime);
 
         return issue;
     }
