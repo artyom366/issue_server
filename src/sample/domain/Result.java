@@ -1,16 +1,19 @@
 package sample.domain;
 
 
+import java.util.List;
+
 public class Result {
 
     private int event;
+    private Issue.type issueType;
     private double currentTime;
-    private double poissonTime;
-    private double erlangTime;
-    private double processingTime;
-    private double remainingTime;
-    private boolean serverStatus;
+    private boolean isAvailableServer;
+    private double poissonIssueGenerationTime;
+    private double erlangIssueGenerationTime;
+    private double currentIssueEndProcessingTime;
     private int queueLength;
+    private List<Issue.type> issuesInQueue;
 
     public int getEvent() {
         return event;
@@ -18,6 +21,14 @@ public class Result {
 
     public void setEvent(int event) {
         this.event = event;
+    }
+
+    public Issue.type getIssueType() {
+        return issueType;
+    }
+
+    public void setIssueType(Issue.type issueType) {
+        this.issueType = issueType;
     }
 
     public double getCurrentTime() {
@@ -28,44 +39,50 @@ public class Result {
         this.currentTime = currentTime;
     }
 
-    public double getPoissonTime() {
-        return poissonTime;
+    public boolean getIsAvailableServer() {
+        return isAvailableServer;
     }
 
-    public void setPoissonTime(double poissonTime) {
-        this.poissonTime = poissonTime;
+    public void setAvailableServer(boolean availableServer) {
+        this.isAvailableServer = availableServer;
     }
 
-    public double getErlangTime() {
-        return erlangTime;
+    public double getPoissonIssueGenerationTime() {
+        return poissonIssueGenerationTime;
     }
 
-    public void setErlangTime(double erlangTime) {
-        this.erlangTime = erlangTime;
+    private void setPoissonIssueGenerationTime(double poissonIssueGenerationTime) {
+        this.poissonIssueGenerationTime = poissonIssueGenerationTime;
     }
 
-    public double getProcessingTime() {
-        return processingTime;
+    public double getErlangIssueGenerationTime() {
+        return erlangIssueGenerationTime;
     }
 
-    public void setProcessingTime(double processingTime) {
-        this.processingTime = processingTime;
+    private void setErlangIssueGenerationTime(double erlangIssueGenerationTime) {
+        this.erlangIssueGenerationTime = erlangIssueGenerationTime;
     }
 
-    public double getRemainingTime() {
-        return remainingTime;
+    public void setCurrentIssueGenerationTime(Issue current) {
+
+        if (Issue.type.POISSON.equals(current.getType())) {
+            setPoissonIssueGenerationTime(current.getGenerationTime());
+            setErlangIssueGenerationTime(-1);
+        } else if (Issue.type.ERLANG.equals(current.getType())) {
+            setErlangIssueGenerationTime(current.getGenerationTime());
+            setPoissonIssueGenerationTime(-1);
+        } else {
+            setErlangIssueGenerationTime(-1);
+            setPoissonIssueGenerationTime(-1);
+        }
     }
 
-    public void setRemainingTime(double remainingTime) {
-        this.remainingTime = remainingTime;
+    public double getCurrentIssueEndProcessingTime() {
+        return currentIssueEndProcessingTime;
     }
 
-    public boolean isServerStatus() {
-        return serverStatus;
-    }
-
-    public void setServerStatus(boolean serverStatus) {
-        this.serverStatus = serverStatus;
+    public void setCurrentIssueEndProcessingTime(double currentIssueEndProcessingTime) {
+        this.currentIssueEndProcessingTime = currentIssueEndProcessingTime;
     }
 
     public int getQueueLength() {
@@ -76,17 +93,11 @@ public class Result {
         this.queueLength = queueLength;
     }
 
-    @Override
-    public String toString() {
-        return "Result{" +
-                "event = " + event +
-                ", currentTime = " + currentTime +
-                ", poissonTime = " + poissonTime +
-                ", erlangTime = " + erlangTime +
-                ", processingTime = " + processingTime +
-                ", remainingTime = " + remainingTime +
-                ", serverStatus = " + serverStatus +
-                ", queueLength = " + queueLength +
-                '}';
+    public List<Issue.type> getIssuesInQueue() {
+        return issuesInQueue;
+    }
+
+    public void setIssuesInQueue(List<Issue.type> issuesInQueue) {
+        this.issuesInQueue = issuesInQueue;
     }
 }

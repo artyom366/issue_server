@@ -3,6 +3,7 @@ package sample.domain;
 
 public class Issue {
 
+    private int number;
     private double randomGenerationValue;
     private double randomProcessingValue;
     private double generationTime;
@@ -10,7 +11,15 @@ public class Issue {
     private boolean isAwaiting;
     private type type;
 
-    public enum type {ERLANG, POISSON}
+    public enum type {ERLANG, POISSON, NO_ISSUE}
+
+    public int getNumber() {
+        return number;
+    }
+
+    public void setNumber(int number) {
+        this.number = number;
+    }
 
     public double getRandomGenerationValue() {
         return randomGenerationValue;
