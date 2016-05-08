@@ -11,12 +11,12 @@ public class ServerService {
 
         if (issue.getType().equals(Issue.type.ERLANG)) {
             double time = NormaDistributionGenerator.generate();
-            issue.setIsAwaiting(false);
+            issue.setAwaiting(false);
             return time;
 
         } else {
             double time = ExponentialDistributionGenerator.generate();
-            issue.setIsAwaiting(false);
+            issue.setAwaiting(false);
             return time;
         }
     }

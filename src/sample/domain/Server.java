@@ -5,13 +5,10 @@ public class Server {
 
     private boolean isAvailable;
     private int counter;
+    private Issue issueOnServer;
 
     public boolean isAvailable() {
         return isAvailable;
-    }
-
-    public void setIsAvailable(boolean isAvailable) {
-        this.isAvailable = isAvailable;
     }
 
     public int getCounter() {
@@ -20,5 +17,17 @@ public class Server {
 
     public void setCounter(int counter) {
         this.counter = counter;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
+
+    public Issue getIssueOnServer() {
+        return issueOnServer;
+    }
+
+    public void setIssueOnServer(Issue issueOnServer) {
+        this.issueOnServer = issueOnServer;
     }
 }

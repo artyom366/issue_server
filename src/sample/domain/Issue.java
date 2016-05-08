@@ -6,6 +6,7 @@ public class Issue {
     private double randomGenerationValue;
     private double randomProcessingValue;
     private double generationTime;
+    private double processingStartTime;
     private boolean isAwaiting;
     private type type;
 
@@ -36,12 +37,20 @@ public class Issue {
         this.generationTime = generationTime;
     }
 
+    public double getProcessingStartTime() {
+        return processingStartTime;
+    }
+
+    public void setProcessingStartTime(double processingStartTime) {
+        this.processingStartTime = processingStartTime;
+    }
+
     public boolean isAwaiting() {
         return isAwaiting;
     }
 
-    public void setIsAwaiting(boolean isAwaiting) {
-        this.isAwaiting = isAwaiting;
+    public void setAwaiting(boolean awaiting) {
+        isAwaiting = awaiting;
     }
 
     public Issue.type getType() {

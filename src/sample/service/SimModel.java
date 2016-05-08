@@ -1,7 +1,6 @@
 package sample.service;
 
 import sample.domain.Issue;
-import sample.domain.Result;
 import sample.domain.Server;
 import sample.system.Reference;
 
@@ -9,97 +8,57 @@ import java.util.*;
 
 public class SimModel {
 
+    private static List<Issue> erlangList;
+    private static List<Issue> poissonList;
+    private static Queue<Issue> timeLine;
+
     private static Queue<Issue> queue = new LinkedList<>();
     private static Server server = new Server();
 
     private static double currentTime = 0d;
-    private static double futureTime = 0d;
-
-    private static int erlangMarker = 0;
-    private static int poissonMarker = 0;
-
-    private static List<Issue> erlangList;
-    private static List<Issue> poissonList;
-
-    private static int eventCounter = 0;
-    private static List<Result> results = new ArrayList<>();
-    private static Result result = new Result();
 
     public static void run() {
 
+        server.setAvailable(true);
+
         erlangList = makeErlangIssues();
         poissonList = makePoissonList();
+        timeLine = makeTimeLine();
 
-        server.setIsAvailable(true);
+        do {
+            if (timeLine.isEmpty()) break;
 
-        getIssues();
-    }
 
-    private static void getIssues() {
-        if (erlangList.get(erlangMarker).getGenerationTime() > poissonList.get(poissonMarker).getGenerationTime()) {
-            run(poissonList.get(poissonMarker), erlangList.get(erlangMarker));
-        } else {
-            run(erlangList.get(erlangMarker), poissonList.get(poissonMarker));
-        }
-    }
-
-    private static void run(Issue next, Issue following) {
-
-        eventCounter++;
-        result.setEvent(eventCounter);
-
-        if (futureTime < next.getGenerationTime()) {
-
-            currentTime = currentTime + next.getRandomGenerationValue();
-            queue.add(next);
+            Issue issue = timeLine.remove();
+            currentTime = issue.getGenerationTime();
+            queue.add(issue);
 
             if (server.isAvailable()) {
+                server.setAvailable(false);
 
-                server.setIsAvailable(false);
+                if (queue.peek() != null) {
+                    Issue issueOnServer = queue.remove();
+                    server.setIssueOnServer(issueOnServer);
+                    issueOnServer.setProcessingStartTime(currentTime);
 
-                Issue current;
-                try {
-                    current = queue.remove();
-                } catch (NoSuchElementException e) {
-                    return;
-                }
-
-                futureTime = currentTime + current.getRandomProcessingValue();
-
-                if (following.getGenerationTime() < currentTime) {
-                    queue.add(following);
+                    if (currentTime > (issueOnServer.getRandomProcessingValue() + issueOnServer.getProcessingStartTime()))
+                        server.setAvailable(true);
                 }
 
             } else {
-                futureTime = currentTime;
-                server.setIsAvailable(true);
-                queue.add(next);
+                Issue issueOnServer = server.getIssueOnServer();
+
+                if (currentTime > (issueOnServer.getRandomProcessingValue() + issueOnServer.getProcessingStartTime()))
+                    server.setAvailable(true);
             }
 
-        } else {
-            currentTime = futureTime;
-            server.setIsAvailable(true);
-            queue.add(next);
-        }
-
-        if (next.getType().equals(Issue.type.POISSON)) {
-            poissonMarker++;
-
-        } else {
-            erlangMarker++;
-        }
-
-        getIssues();
+        } while (currentTime < Reference.MODEL_TIME);
     }
-
-
-
 
 
     private static List<Issue> makeErlangIssues() {
 
         List<Issue> erlangList = new ArrayList<>();
-
         double time = 0d;
 
         do {
@@ -121,7 +80,6 @@ public class SimModel {
     private static List<Issue> makePoissonList() {
 
         List<Issue> poissonList = new ArrayList<>();
-
         double time = 0d;
 
         do {
@@ -138,6 +96,27 @@ public class SimModel {
         } while (time < Reference.MODEL_TIME);
 
         return poissonList;
+    }
+
+    private static Queue<Issue> makeTimeLine() {
+
+        List<Issue> sorted = new ArrayList<>();
+        sorted.addAll(poissonList);
+        sorted.addAll(erlangList);
+
+        Comparator<Issue> comparator = new Comparator<Issue>() {
+            @Override
+            public int compare(Issue o1, Issue o2) {
+                if (o1.getGenerationTime() > o2.getGenerationTime()) {
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        };
+
+        Collections.sort(sorted, comparator);
+        return new LinkedList<>(sorted);
     }
 
 
