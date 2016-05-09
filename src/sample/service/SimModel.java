@@ -5,6 +5,7 @@ import sample.domain.Result;
 import sample.domain.Server;
 import sample.system.Reference;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class SimModel {
@@ -18,7 +19,7 @@ public class SimModel {
 
     private static List<Result> results = new ArrayList<>();
 
-    private static double currentTime = 0d;
+    private static BigDecimal currentTime = BigDecimal.valueOf(0d);
 
     public static List<Result> run() {
 
@@ -33,8 +34,10 @@ public class SimModel {
         result.setIssueType(Issue.type.NO_ISSUE);
         result.setCurrentTime(currentTime);
         result.setCurrentIssueGenerationTime(new Issue());
-        result.setCurrentIssueEndProcessingTime(Reference.MODEL_TIME);
-        result.setAvailableServer(true);
+        result.setCurrentIssueStartProcessingTime(BigDecimal.valueOf(Reference.MODEL_TIME));
+        result.setCurrentIssueProcessingTime(BigDecimal.valueOf(Reference.MODEL_TIME));
+        result.setCurrentIssueEndProcessingTime(BigDecimal.valueOf(Reference.MODEL_TIME));
+        result.setIsAvailableServer(true);
         result.setQueueLength(0);
         result.setIssuesInQueue(Collections.emptyList());
         results.add(result);
@@ -61,9 +64,10 @@ public class SimModel {
             result.setIssueType(current.getType());
             result.setCurrentTime(currentTime);
             result.setCurrentIssueGenerationTime(current);
+            result.setCurrentIssueProcessingTime(current.getRandomProcessingValue());
 
             if (server.isAvailable()) {
-                result.setAvailableServer(server.isAvailable());
+                result.setIsAvailableServer(server.isAvailable());
 
                 server.setAvailable(false);
 
@@ -72,28 +76,33 @@ public class SimModel {
                     server.setIssueOnServer(issueOnServer);
                     issueOnServer.setProcessingStartTime(currentTime);
 
-                    if (currentTime > (issueOnServer.getRandomProcessingValue() + issueOnServer.getProcessingStartTime())) {
+                    if (currentTime.doubleValue() > (issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()).doubleValue())) {
                         server.setAvailable(true);
 
-                        results.get(issueOnServer.getNumber()).setCurrentIssueEndProcessingTime(issueOnServer.getRandomProcessingValue() + issueOnServer.getProcessingStartTime());
+                        if (issueOnServer.getNumber() < results.size()) {
+                            results.get(issueOnServer.getNumber() + 1).setCurrentIssueEndProcessingTime(issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()));
+                        }
                     }
                 }
 
             } else {
-                result.setAvailableServer(server.isAvailable());
+                result.setIsAvailableServer(server.isAvailable());
 
                 Issue issueOnServer = server.getIssueOnServer();
-                if (currentTime > (issueOnServer.getRandomProcessingValue() + issueOnServer.getProcessingStartTime())) {
+
+                if (currentTime.doubleValue() > (issueOnServer.getRandomProcessingValue().add( issueOnServer.getProcessingStartTime()).doubleValue())) {
                     server.setAvailable(true);
 
-                    results.get(issueOnServer.getNumber()).setCurrentIssueEndProcessingTime(issueOnServer.getRandomProcessingValue() + issueOnServer.getProcessingStartTime());
+                    if (issueOnServer.getNumber() < results.size()) {
+                        results.get(issueOnServer.getNumber() + 1).setCurrentIssueEndProcessingTime(issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()));
+                    }
                 }
             }
 
             results.add(result);
             loopCounter++;
 
-        } while (currentTime < Reference.MODEL_TIME);
+        } while (currentTime.doubleValue() < Reference.MODEL_TIME);
 
         return results;
     }
@@ -102,20 +111,20 @@ public class SimModel {
     private static List<Issue> makeErlangIssues() {
 
         List<Issue> erlangList = new ArrayList<>();
-        double time = 0d;
+        BigDecimal time = BigDecimal.valueOf(0d);
 
         do {
 
             Issue erlang = ErlangIssueFactory.getInstance(time);
 
-            double serveTime = ServerService.serve(erlang);
+            BigDecimal serveTime = ServerService.serve(erlang);
 
-            time = time + erlang.getRandomGenerationValue();
+            time = time.add(erlang.getRandomGenerationValue());
             erlang.setRandomProcessingValue(serveTime);
 
             erlangList.add(erlang);
 
-        } while (time < Reference.MODEL_TIME);
+        } while (time.doubleValue() < Reference.MODEL_TIME);
 
         return erlangList;
     }
@@ -123,20 +132,20 @@ public class SimModel {
     private static List<Issue> makePoissonList() {
 
         List<Issue> poissonList = new ArrayList<>();
-        double time = 0d;
+        BigDecimal time = BigDecimal.valueOf(0d);
 
         do {
 
             Issue poisson = PoissonIssueFactory.getInstance(time);
 
-            double serveTime = ServerService.serve(poisson);
+            BigDecimal serveTime = ServerService.serve(poisson);
 
-            time = time + poisson.getRandomGenerationValue();
+            time = time.add(poisson.getRandomGenerationValue());
             poisson.setRandomProcessingValue(serveTime);
 
             poissonList.add(poisson);
 
-        } while (time < Reference.MODEL_TIME);
+        } while (time.doubleValue() < Reference.MODEL_TIME);
 
         return poissonList;
     }
@@ -150,7 +159,7 @@ public class SimModel {
         Comparator<Issue> comparator = new Comparator<Issue>() {
             @Override
             public int compare(Issue o1, Issue o2) {
-                if (o1.getGenerationTime() > o2.getGenerationTime()) {
+                if (o1.getGenerationTime().doubleValue() > o2.getGenerationTime().doubleValue()) {
                     return 1;
                 } else {
                     return -1;

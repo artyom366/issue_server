@@ -2,14 +2,16 @@ package sample.core;
 
 import sample.system.Reference;
 
+import java.math.BigDecimal;
+
 public class ErlangFlowGenerator {
 
-    public static double generate() {
-        double sum = 0d;
+    public static BigDecimal generate() {
+        BigDecimal sum = BigDecimal.valueOf(0d);
 
         for (int i = 0; i < Reference.ERLANG_SUM; i++) {
-            double value = ExponentialDistributionGenerator.generate();
-            sum += value;
+            BigDecimal value = ExponentialDistributionGenerator.generate();
+            sum = sum.add(value);
         }
 
         return sum;

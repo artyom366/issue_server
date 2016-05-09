@@ -1,13 +1,15 @@
 package sample.domain;
 
 
+import java.math.BigDecimal;
+
 public class Issue {
 
     private int number;
-    private double randomGenerationValue;
-    private double randomProcessingValue;
-    private double generationTime;
-    private double processingStartTime;
+    private BigDecimal randomGenerationValue;
+    private BigDecimal randomProcessingValue;
+    private BigDecimal generationTime;
+    private BigDecimal processingStartTime;
     private boolean isAwaiting;
     private type type;
 
@@ -21,36 +23,35 @@ public class Issue {
         this.number = number;
     }
 
-    public double getRandomGenerationValue() {
+    public BigDecimal getRandomGenerationValue() {
         return randomGenerationValue;
     }
 
-    public void setRandomGenerationValue(double randomGenerationValue) {
+    public void setRandomGenerationValue(BigDecimal randomGenerationValue) {
         this.randomGenerationValue = randomGenerationValue;
     }
 
-    public double getRandomProcessingValue() {
-
+    public BigDecimal getRandomProcessingValue() {
         return randomProcessingValue;
     }
 
-    public void setRandomProcessingValue(double randomProcessingValue) {
+    public void setRandomProcessingValue(BigDecimal randomProcessingValue) {
         this.randomProcessingValue = randomProcessingValue;
     }
 
-    public double getGenerationTime() {
+    public BigDecimal getGenerationTime() {
         return generationTime;
     }
 
-    public void setGenerationTime(double generationTime) {
+    public void setGenerationTime(BigDecimal generationTime) {
         this.generationTime = generationTime;
     }
 
-    public double getProcessingStartTime() {
+    public BigDecimal getProcessingStartTime() {
         return processingStartTime;
     }
 
-    public void setProcessingStartTime(double processingStartTime) {
+    public void setProcessingStartTime(BigDecimal processingStartTime) {
         this.processingStartTime = processingStartTime;
     }
 

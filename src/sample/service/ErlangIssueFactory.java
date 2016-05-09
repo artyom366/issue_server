@@ -4,15 +4,17 @@ package sample.service;
 import sample.core.ErlangFlowGenerator;
 import sample.domain.Issue;
 
+import java.math.BigDecimal;
+
 public class ErlangIssueFactory {
 
-    public static Issue getInstance(double currentTime) {
+    public static Issue getInstance(BigDecimal currentTime) {
         Issue issue = new Issue();
         issue.setType(Issue.type.ERLANG);
 
-        double generationTime = ErlangFlowGenerator.generate();
+        BigDecimal generationTime = ErlangFlowGenerator.generate();
         issue.setRandomGenerationValue(generationTime);
-        issue.setGenerationTime(currentTime + generationTime);
+        issue.setGenerationTime(currentTime.add(generationTime));
 
         return issue;
     }
