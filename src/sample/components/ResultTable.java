@@ -1,10 +1,14 @@
 package sample.components;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
 import sample.domain.Issue;
 import sample.domain.Result;
 import sample.system.Reference;
@@ -15,7 +19,6 @@ import java.util.List;
 public class ResultTable {
 
     private TableView<Result> table;
-    private ObservableList<Result> data;
 
     public ResultTable() {
         this.table = new TableView<>();
@@ -24,11 +27,6 @@ public class ResultTable {
     }
 
     public TableView<Result> init() {
-        return table;
-    }
-
-    public void setData(List<Result> results) {
-
 
         TableColumn<Result, Integer> eventColumn = new TableColumn<>("#");
         eventColumn.setCellValueFactory(new PropertyValueFactory<>("event"));
@@ -54,6 +52,10 @@ public class ResultTable {
         erlangIssueGenerationTime.setCellValueFactory(new PropertyValueFactory<>("erlangIssueGenerationTime"));
         erlangIssueGenerationTime.setPrefWidth(85);
 
+        TableColumn<Result, BigDecimal> currentIssueProcessingTimeStart = new TableColumn<>("Start");
+        currentIssueProcessingTimeStart.setCellValueFactory(new PropertyValueFactory<>("currentIssueStartProcessingTime"));
+        currentIssueProcessingTimeStart.setPrefWidth(85);
+
         TableColumn<Result, BigDecimal> currentIssueProcessingTime = new TableColumn<>("Processing");
         currentIssueProcessingTime.setCellValueFactory(new PropertyValueFactory<>("currentIssueProcessingTime"));
         currentIssueProcessingTime.setPrefWidth(85);
@@ -76,12 +78,17 @@ public class ResultTable {
                 isAvailableServer,
                 poissonIssueGenerationTime,
                 erlangIssueGenerationTime,
+                currentIssueProcessingTimeStart,
                 currentIssueProcessingTime,
                 currentIssueProcessingTimeEnd,
                 queueLength,
                 issuesInQueue);
 
-        data = FXCollections.observableList(results);
+        return table;
+    }
+
+    public void setData(List<Result> results) {
+        ObservableList<Result> data = FXCollections.observableList(results);
         table.setItems(data);
     }
 

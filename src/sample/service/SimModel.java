@@ -78,15 +78,26 @@ public class SimModel {
                 if (queue.peek() != null) {
                     Issue issueOnServer = queue.remove();
                     server.setIssueOnServer(issueOnServer);
-                    issueOnServer.setProcessingStartTime(processingEndTimeMarker);
+
+                    if (loopCounter == 1) {
+                        issueOnServer.setProcessingStartTime(currentTime);
+                        result.setCurrentIssueStartProcessingTime(currentTime);
+                    } else {
+
+                        issueOnServer.setProcessingStartTime(processingEndTimeMarker);
+
+                        if (issueOnServer.getNumber() < results.size()) {
+                            results.get(issueOnServer.getNumber() + 1).setCurrentIssueStartProcessingTime(issueOnServer.getProcessingStartTime());
+                        }
+                    }
 
                     if (currentTime.doubleValue() > (issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()).doubleValue())) {
                         server.setAvailable(true);
 
-                        if (issueOnServer.getNumber() < results.size()) {
-                            results.get(issueOnServer.getNumber() + 1).setCurrentIssueEndProcessingTime(issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()));
-                            processingEndTimeMarker = issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime());
-                        }
+//                        if (issueOnServer.getNumber() < results.size()) {
+//                            results.get(issueOnServer.getNumber() + 1).setCurrentIssueEndProcessingTime(issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()));
+//                            processingEndTimeMarker = issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime());
+//                        }
                     }
                 }
 

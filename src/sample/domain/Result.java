@@ -1,6 +1,8 @@
 package sample.domain;
 
 
+import sample.system.Reference;
+
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -41,7 +43,7 @@ public class Result {
     }
 
     public void setCurrentTime(BigDecimal currentTime) {
-        this.currentTime = currentTime.setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.currentTime = currentTime.setScale(Reference.ROUNDING_SCALE, BigDecimal.ROUND_HALF_UP);
     }
 
     public boolean getIsAvailableServer() {
@@ -57,7 +59,7 @@ public class Result {
     }
 
     private void setPoissonIssueGenerationTime(BigDecimal poissonIssueGenerationTime) {
-        this.poissonIssueGenerationTime = poissonIssueGenerationTime.setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.poissonIssueGenerationTime = poissonIssueGenerationTime.setScale(Reference.ROUNDING_SCALE, BigDecimal.ROUND_HALF_UP);
     }
 
     public BigDecimal getErlangIssueGenerationTime() {
@@ -65,16 +67,16 @@ public class Result {
     }
 
     private void setErlangIssueGenerationTime(BigDecimal erlangIssueGenerationTime) {
-        this.erlangIssueGenerationTime = erlangIssueGenerationTime.setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.erlangIssueGenerationTime = erlangIssueGenerationTime.setScale(Reference.ROUNDING_SCALE, BigDecimal.ROUND_HALF_UP);
     }
 
     public void setCurrentIssueGenerationTime(Issue current) {
 
         if (Issue.type.POISSON.equals(current.getType())) {
-            setPoissonIssueGenerationTime(current.getGenerationTime().setScale(3, BigDecimal.ROUND_HALF_UP));
+            setPoissonIssueGenerationTime(current.getGenerationTime().setScale(Reference.ROUNDING_SCALE, BigDecimal.ROUND_HALF_UP));
             setErlangIssueGenerationTime(BigDecimal.ZERO);
         } else if (Issue.type.ERLANG.equals(current.getType())) {
-            setErlangIssueGenerationTime(current.getGenerationTime().setScale(3, BigDecimal.ROUND_HALF_UP));
+            setErlangIssueGenerationTime(current.getGenerationTime().setScale(Reference.ROUNDING_SCALE, BigDecimal.ROUND_HALF_UP));
             setPoissonIssueGenerationTime(BigDecimal.ZERO);
         } else {
             setErlangIssueGenerationTime(BigDecimal.ZERO);
@@ -87,7 +89,7 @@ public class Result {
     }
 
     public void setCurrentIssueStartProcessingTime(BigDecimal currentIssueStartProcessingTime) {
-        this.currentIssueStartProcessingTime = currentIssueStartProcessingTime.setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.currentIssueStartProcessingTime = currentIssueStartProcessingTime.setScale(Reference.ROUNDING_SCALE, BigDecimal.ROUND_HALF_UP);
     }
 
     public BigDecimal getCurrentIssueProcessingTime() {
@@ -95,7 +97,7 @@ public class Result {
     }
 
     public void setCurrentIssueProcessingTime(BigDecimal currentIssueProcessingTime) {
-        this.currentIssueProcessingTime = currentIssueProcessingTime.setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.currentIssueProcessingTime = currentIssueProcessingTime.setScale(Reference.ROUNDING_SCALE, BigDecimal.ROUND_HALF_UP);
     }
 
     public BigDecimal getCurrentIssueEndProcessingTime() {
@@ -103,7 +105,7 @@ public class Result {
     }
 
     public void setCurrentIssueEndProcessingTime(BigDecimal currentIssueEndProcessingTime) {
-        this.currentIssueEndProcessingTime = currentIssueEndProcessingTime.setScale(3, BigDecimal.ROUND_HALF_UP);
+        this.currentIssueEndProcessingTime = currentIssueEndProcessingTime.setScale(Reference.ROUNDING_SCALE, BigDecimal.ROUND_HALF_UP);
     }
 
     public int getQueueLength() {

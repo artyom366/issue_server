@@ -14,6 +14,9 @@ public class RefreshButton {
     }
 
     public Button init() {
+        this.refreshButton.setLayoutX(10);
+        this.refreshButton.setLayoutY(580);
+
         return this.refreshButton;
     }
 

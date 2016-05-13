@@ -33,7 +33,7 @@ public class Main extends Application {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle(Reference.TITLE);
         initRootLayout();
-        getData();
+        resultTable.setData(getData());
         setActions();
     }
 
@@ -42,17 +42,17 @@ public class Main extends Application {
             @Override
             public void handle(ActionEvent event) {
                 resultTable.clearTableData();
-                getData();
+                resultTable.setData(getData());
             }
         };
 
         refreshButton.addAction(refresh);
     }
 
-    private void getData() {
+    private List<Result> getData() {
         SimModel model = new SimModel();
         List<Result> results = model.run();
-        resultTable.setData(results);
+        return results;
     }
 
     public static void main(String[] args) {
