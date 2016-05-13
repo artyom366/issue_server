@@ -1,5 +1,8 @@
 package sample.service;
 
+import sample.core.ErlangFlowGenerator;
+import sample.core.ExponentialDistributionGenerator;
+import sample.core.NormaDistributionGenerator;
 import sample.domain.Issue;
 import sample.domain.Result;
 import sample.domain.Server;
@@ -10,22 +13,23 @@ import java.util.*;
 
 public class SimModel {
 
-    private static List<Issue> erlangList;
-    private static List<Issue> poissonList;
-    private static Queue<Issue> timeLine;
+    private List<Issue> erlangList = new ArrayList<>();
+    private List<Issue> poissonList = new ArrayList<>();
 
-    private static Queue<Issue> queue = new LinkedList<>();
-    private static Server server = new Server();
+    private Queue<Issue> queue = new LinkedList<>();
+    private Server server = new Server();
 
-    private static List<Result> results = new ArrayList<>();
+    private List<Result> results = new ArrayList<>();
 
-    private static BigDecimal currentTime = BigDecimal.valueOf(0d);
 
-    public static List<Result> run() {
+
+    public List<Result> run() {
+        BigDecimal currentTime = BigDecimal.valueOf(0d);
+        BigDecimal processingEndTimeMarker = BigDecimal.valueOf(0d);
 
         erlangList = makeErlangIssues();
         poissonList = makePoissonList();
-        timeLine = makeTimeLine();
+        Queue<Issue> timeLine = makeTimeLine();
 
         server.setAvailable(true);
 
@@ -74,13 +78,14 @@ public class SimModel {
                 if (queue.peek() != null) {
                     Issue issueOnServer = queue.remove();
                     server.setIssueOnServer(issueOnServer);
-                    issueOnServer.setProcessingStartTime(currentTime);
+                    issueOnServer.setProcessingStartTime(processingEndTimeMarker);
 
                     if (currentTime.doubleValue() > (issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()).doubleValue())) {
                         server.setAvailable(true);
 
                         if (issueOnServer.getNumber() < results.size()) {
                             results.get(issueOnServer.getNumber() + 1).setCurrentIssueEndProcessingTime(issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()));
+                            processingEndTimeMarker = issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime());
                         }
                     }
                 }
@@ -95,6 +100,7 @@ public class SimModel {
 
                     if (issueOnServer.getNumber() < results.size()) {
                         results.get(issueOnServer.getNumber() + 1).setCurrentIssueEndProcessingTime(issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()));
+                        processingEndTimeMarker = issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime());
                     }
                 }
             }
@@ -108,16 +114,22 @@ public class SimModel {
     }
 
 
-    private static List<Issue> makeErlangIssues() {
+    private List<Issue> makeErlangIssues() {
 
         List<Issue> erlangList = new ArrayList<>();
         BigDecimal time = BigDecimal.valueOf(0d);
 
+        ErlangIssue erlangIssue = new ErlangIssue();
+
+        ErlangFlowGenerator erlangFlow = new ErlangFlowGenerator();
+        NormaDistributionGenerator normal = new NormaDistributionGenerator();
+        ServerService serverService = new ServerService();
+
         do {
 
-            Issue erlang = ErlangIssueFactory.getInstance(time);
+            Issue erlang = erlangIssue.produce(time, erlangFlow);
 
-            BigDecimal serveTime = ServerService.serve(erlang);
+            BigDecimal serveTime = serverService.serve(erlang, normal);
 
             time = time.add(erlang.getRandomGenerationValue());
             erlang.setRandomProcessingValue(serveTime);
@@ -129,16 +141,21 @@ public class SimModel {
         return erlangList;
     }
 
-    private static List<Issue> makePoissonList() {
+    private List<Issue> makePoissonList() {
 
         List<Issue> poissonList = new ArrayList<>();
         BigDecimal time = BigDecimal.valueOf(0d);
 
+        ExponentialDistributionGenerator exponential = new ExponentialDistributionGenerator();
+        NormaDistributionGenerator normal = new NormaDistributionGenerator();
+        ServerService serverService = new ServerService();
+
         do {
 
-            Issue poisson = PoissonIssueFactory.getInstance(time);
+            PoissonIssue poissonIssue = new PoissonIssue();
+            Issue poisson = poissonIssue.produce(time, exponential);
 
-            BigDecimal serveTime = ServerService.serve(poisson);
+            BigDecimal serveTime = serverService.serve(poisson, normal);
 
             time = time.add(poisson.getRandomGenerationValue());
             poisson.setRandomProcessingValue(serveTime);
@@ -150,7 +167,7 @@ public class SimModel {
         return poissonList;
     }
 
-    private static Queue<Issue> makeTimeLine() {
+    private Queue<Issue> makeTimeLine() {
 
         List<Issue> sorted = new ArrayList<>();
         sorted.addAll(poissonList);

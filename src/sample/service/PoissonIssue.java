@@ -1,17 +1,18 @@
 package sample.service;
 
 import sample.core.ExponentialDistributionGenerator;
+import sample.core.Generator;
 import sample.domain.Issue;
 
 import java.math.BigDecimal;
 
-public class PoissonIssueFactory {
+public class PoissonIssue {
 
-    public static Issue getInstance(BigDecimal currentTime) {
+    public Issue produce(BigDecimal currentTime, Generator generator) {
         Issue issue = new Issue();
         issue.setType(Issue.type.POISSON);
 
-        BigDecimal generationTime = ExponentialDistributionGenerator.generate();
+        BigDecimal generationTime = generator.generate();
         issue.setRandomGenerationValue(generationTime);
         issue.setGenerationTime(currentTime.add(generationTime));
 
