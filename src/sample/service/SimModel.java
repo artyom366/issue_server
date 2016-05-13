@@ -94,10 +94,10 @@ public class SimModel {
                     if (currentTime.doubleValue() > (issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()).doubleValue())) {
                         server.setAvailable(true);
 
-//                        if (issueOnServer.getNumber() < results.size()) {
-//                            results.get(issueOnServer.getNumber() + 1).setCurrentIssueEndProcessingTime(issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()));
-//                            processingEndTimeMarker = issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime());
-//                        }
+                        if (issueOnServer.getNumber() < results.size()) {
+                            results.get(issueOnServer.getNumber() + 1).setCurrentIssueEndProcessingTime(issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime()));
+                            processingEndTimeMarker = issueOnServer.getRandomProcessingValue().add(issueOnServer.getProcessingStartTime());
+                        }
                     }
                 }
 
