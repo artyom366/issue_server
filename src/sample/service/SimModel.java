@@ -3,12 +3,14 @@ package sample.service;
 import sample.core.ErlangFlowGenerator;
 import sample.core.ExponentialDistributionGenerator;
 import sample.core.NormaDistributionGenerator;
+import sample.domain.GeneralResults;
 import sample.domain.Issue;
 import sample.domain.Result;
 import sample.domain.Server;
 import sample.system.Reference;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 public class SimModel {
@@ -20,10 +22,9 @@ public class SimModel {
     private Server server = new Server();
 
     private List<Result> results = new ArrayList<>();
+    private GeneralResults generalResults = new GeneralResults();
 
-
-
-    public List<Result> run() {
+    public GeneralResults run() {
         BigDecimal currentTime = BigDecimal.valueOf(0d);
         BigDecimal processingEndTimeMarker = BigDecimal.valueOf(0d);
 
@@ -121,7 +122,51 @@ public class SimModel {
 
         } while (currentTime.doubleValue() < Reference.MODEL_TIME);
 
-        return results;
+        estimateAverageTimeInQueue(results);
+        generalResults.setResults(results);
+        return generalResults;
+    }
+
+    private void estimateAverageTimeInQueue(List<Result> results) {
+
+        int processedIssueCount = 0;
+        BigDecimal timeInQueueSum = BigDecimal.ZERO;
+
+        for (Result result : results) {
+            if (processedIssueCount == 0) {
+                processedIssueCount++;
+                continue;
+            }
+
+            if (processedIssueCount == 1) {
+                generalResults.setServerStartTime(result.getCurrentTime());
+            }
+
+            if(result.getCurrentIssueStartProcessingTime() == null) {
+                break;
+            }
+
+            BigDecimal generated = result.getCurrentTime();
+            BigDecimal startedProcessing = result.getCurrentIssueStartProcessingTime();
+            BigDecimal timeInQueue = startedProcessing.subtract(generated);
+
+            result.setTimeInQueue(timeInQueue);
+            timeInQueueSum = timeInQueueSum.add(timeInQueue);
+
+            processedIssueCount++;
+        }
+
+        generalResults.setProcessedIssueCount(processedIssueCount);
+        generalResults.setAllTimeInQueue(timeInQueueSum);
+
+        BigDecimal averageTimInQueue = timeInQueueSum.divide(BigDecimal.valueOf(processedIssueCount), 1, RoundingMode.HALF_UP);
+        generalResults.setAverageTimeInQueue(averageTimInQueue);
+
+
+        BigDecimal serverBusyTime = BigDecimal.valueOf(Reference.MODEL_TIME).subtract(generalResults.getServerStartTime());
+        BigDecimal serverStartTime = generalResults.getServerStartTime();
+
+        generalResults.setServerLoad(serverStartTime.divide(serverBusyTime, 4, RoundingMode.HALF_UP));
     }
 
 
@@ -149,6 +194,7 @@ public class SimModel {
 
         } while (time.doubleValue() < Reference.MODEL_TIME);
 
+        generalResults.setErlangCounter(erlangList.size());
         return erlangList;
     }
 
@@ -175,6 +221,7 @@ public class SimModel {
 
         } while (time.doubleValue() < Reference.MODEL_TIME);
 
+        generalResults.setPoissonCounter(poissonList.size());
         return poissonList;
     }
 

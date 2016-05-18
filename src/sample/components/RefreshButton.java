@@ -4,6 +4,7 @@ package sample.components;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
+import sample.system.Reference;
 
 public class RefreshButton {
 
@@ -14,8 +15,8 @@ public class RefreshButton {
     }
 
     public Button init() {
-        this.refreshButton.setLayoutX(10);
-        this.refreshButton.setLayoutY(580);
+        this.refreshButton.setLayoutX(Reference.BUTTON_X);
+        this.refreshButton.setLayoutY(Reference.BUTTON_Y);
 
         return this.refreshButton;
     }

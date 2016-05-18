@@ -19,6 +19,7 @@ public class Result {
     private BigDecimal currentIssueEndProcessingTime;
     private int queueLength;
     private List<Issue.type> issuesInQueue;
+    private BigDecimal timeInQueue;
 
     private String issuesInQueueScoreView;
 
@@ -141,5 +142,21 @@ public class Result {
 
     private void setIssuesInQueueScoreView(String issuesInQueueScoreView) {
         this.issuesInQueueScoreView = issuesInQueueScoreView;
+    }
+
+    public boolean isAvailableServer() {
+        return isAvailableServer;
+    }
+
+    public BigDecimal getTimeInQueue() {
+        return timeInQueue;
+    }
+
+    public void setTimeInQueue(BigDecimal timeInQueue) {
+        this.timeInQueue = timeInQueue;
+    }
+
+    public void setAvailableServer(boolean availableServer) {
+        isAvailableServer = availableServer;
     }
 }
